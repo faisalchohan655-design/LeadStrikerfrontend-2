@@ -15,10 +15,10 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// ===== یہ 2 لائن سب سے اہم ہیں =====
-app.use(express.static(path.join(__dirname, 'public')));
+// ===== یہ 2 لائن سب سے اہم ہیں - Public بڑا P =====
+app.use(express.static(path.join(__dirname, 'Public')));
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'Public', 'index.html'));
 });
 // ==================================
 

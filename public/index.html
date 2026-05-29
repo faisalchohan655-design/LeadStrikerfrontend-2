@@ -66,4 +66,52 @@
 <body>
   <div class="container">
     <h1>🔥 Lead Dashboard</h1>
-    <div id="leads" class
+    <div id="leads" class="loading">Loading leads...</div>
+  </div>
+
+  <script>
+    const API_URL = 'https://leadstrikerbackend-production.up.railway.app/api/leads';
+    
+    async function loadLeads() {
+      const container = document.getElementById('leads');
+      
+      try {
+        const res = await fetch(API_URL);
+        
+        if (!res.ok) {
+          throw new Error(`API Error: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p class="loading">No leads found yet</p>';
+          return;
+        }
+        
+        container.className = 'grid';
+        container.innerHTML = data.map(lead => `
+          <div class="lead-card">
+            <h3>${lead.name || 'No Name'}</h3>
+            <p><strong>Email:</strong> ${lead.email || 'N/A'}</p>
+            <p><strong>Phone:</strong> ${lead.phone || 'N/A'}</p>
+            <p><strong>Source:</strong> ${lead.source || 'Website'}</p>
+            <p><strong>Date:</strong> ${new Date(lead.createdAt || lead.date || Date.now()).toLocaleDateString('en-PK')}</p>
+          </div>
+        `).join('');
+        
+      } catch (err) {
+        container.innerHTML = `
+          <div class="error">
+            <strong>Error:</strong> ${err.message}<br>
+            <small>Check if backend URL is correct and running</small>
+          </div>
+        `;
+      }
+    }
+    
+    loadLeads();
+    setInterval(loadLeads, 30000); // Auto refresh every 30 sec
+  </script>
+</body>
+</html>

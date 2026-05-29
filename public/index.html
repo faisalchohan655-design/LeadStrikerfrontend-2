@@ -1,62 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-<!DOCTYPE html>
-<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LeadStriker Dashboard</title>
+  <title>Lead Dashboard</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
-      font-family: Arial, sans-serif; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #0f172a; 
-      color: white; 
+      color: #e2e8f0; 
       padding: 20px;
-      text-align: center;
     }
-    h1 { color: #38bdf8; }
-    .lead {
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { 
+      color: #38bdf8; 
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .lead-card {
       background: #1e293b;
-      padding: 15px;
-      margin: 10px auto;
-      border-radius: 8px;
-      max-width: 400px;a
-      text-align: left;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      transition: transform 0.2s, border-color 0.2s;
     }
-    .lead strong { color: #22c55e; }
+    .lead-card:hover {
+      transform: translateY(-5px);
+      border-color: #38bdf8;
+    }
+    .lead-card h3 {
+      color: #38bdf8;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+    .lead-card p {
+      margin: 8px 0;
+      color: #cbd5e1;
+    }
+    .lead-card strong {
+      color: #94a3b8;
+    }
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 18px;
+      color: #94a3b8;
+    }
+    .error {
+      background: #7f1d1d;
+      border: 1px solid #ef4444;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>📊 LeadStriker Dashboard</h1>
-  <div id="leads">Loading leads...</div>
-
-  <script>
-    // Railway کا backend URL یہاں لگا دیا ہے
-    const API_URL = 'https://leadstriker-production.up.railway.app/api/leads';
-
-    async function loadLeads() {
-      try {
-        const res = await fetch(API_URL);
-        const leads = await res.json();
-        
-        const container = document.getElementById('leads');
-        container.innerHTML = '';
-        
-        leads.forEach(lead => {
-          container.innerHTML += `
-            <div class="lead">
-              <strong>Name:</strong> ${lead.name} <br>
-              <strong>Email:</strong> ${lead.email} <br>
-              <strong>Phone:</strong> ${lead.phone}
-            </div>
-          `;
-        });
-      } catch (err) {
-        document.getElementById('leads').innerHTML = 'Error loading leads: ' + err;
-      }
-    }
-
-    loadLeads();
-  </script>
-</body>
-</html>
+  <div class="container">
+    <h1>🔥 Lead Dashboard</h1>
+    <div id="leads" class

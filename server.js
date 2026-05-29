@@ -1,22 +1,49 @@
-const express = require('express');
-const path = require('path');
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Static files serve کرنے کیلئے - CSS, JS, images
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Homepage route - یہی ڈیش بورڈ کھولے گا
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lead Dashboard</title>
+<style>
+body { font-family: Arial; background: #0f172a; color: white; padding: 20px; }
+h1 { color: #38bdf8; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th, td { border: 1px solid #334155; padding: 12px; text-align: left; }
+th { background: #1e293b; }
+</style>
+</head>
+<body>
+<h1>🎯 Lead Dashboard</h1>
+<table id="leads-table">
+<thead>
+<tr><th>ID</th><th>Name</th><th>Email</th><th>Source</th><th>Date</th></tr>
+</thead>
+<tbody>
+<tr><td colspan="5">Loading...</td></tr>
+</tbody>
+</table>
+<script>
+fetch('/api/leads')
+.then(res => res.json())
+.then(data => {
+const tbody = document.querySelector('#leads-table tbody');
+if(!data || data.length === 0){
+tbody.innerHTML = '<tr><td colspan="5">کوئی لیڈ نہیں ملی</td></tr>';
+return;
+}
+tbody.innerHTML = data.map(lead => `
+<tr>
+<td>${lead.id}</td>
+<td>${lead.name}</td>
+<td>${lead.email}</td>
+<td>${lead.source}</td>
+<td>${new Date(lead.created_at).toLocaleDateString()}</td>
+</tr>`).join('');
+})
+.catch(err => {
+console.error(err);
+document.querySelector('#leads-table tbody').innerHTML = 
+'<tr><td colspan="5">Backend connect نہیں ہو رہا</td></tr>';
 });
-
-// Health check - ٹیسٹ کرنے کیلئے
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
-// Railway کیلئے 0.0.0.0 پر لسٹن لازمی ہے
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-});
+</script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,10 +23,14 @@ th { background: #1e293b; }
 </tbody>
 </table>
 <script>
-fetch('https://leadstrike-backend-3-72p8.onrender.com/api/leads')
+fetch('/api/leads')
 .then(res => res.json())
 .then(data => {
 const tbody = document.querySelector('#leads-table tbody');
+if(!data || data.length === 0){
+tbody.innerHTML = '<tr><td colspan="5">کوئی لیڈ نہیں ملی</td></tr>';
+return;
+}
 tbody.innerHTML = data.map(lead => `
 <tr>
 <td>${lead.id}</td>
@@ -35,7 +40,8 @@ tbody.innerHTML = data.map(lead => `
 <td>${new Date(lead.created_at).toLocaleDateString()}</td>
 </tr>`).join('');
 })
-.catch(() => {
+.catch(err => {
+console.error(err);
 document.querySelector('#leads-table tbody').innerHTML = 
 '<tr><td colspan="5">Backend connect نہیں ہو رہا</td></tr>';
 });

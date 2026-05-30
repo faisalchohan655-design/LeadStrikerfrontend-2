@@ -26,7 +26,7 @@ const leadSchema = new mongoose.Schema({
 });
 const Lead = mongoose.model('Lead', leadSchema);
 
-// Scrape Route - Outscraper کا اصل structure
+// Scrape Route
 app.post('/api/scrape', async (req, res) => {
   try {
     const { keyword, location } = req.body;
@@ -36,8 +36,7 @@ app.post('/api/scrape', async (req, res) => {
       headers: { 'X-API-KEY': process.env.OUTSCRAPER_API_KEY }
     });
 
-    // Outscraper اصل data یہاں دیتا ہے
-    const places = response.data || [];
+    const places = response.data || []; // ← یہ لائن ٹھیک کی
     let count = 0;
 
     for (const place of places) {

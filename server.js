@@ -26,26 +26,24 @@ const leadSchema = new mongoose.Schema({
 });
 const Lead = mongoose.model('Lead', leadSchema);
 
-// Scrape Route
+// Scrape Route - Outscraper کا اصل structure
 app.post('/api/scrape', async (req, res) => {
   try {
     const { keyword, location } = req.body;
     
     const response = await axios.get('https://api.app.outscraper.com/maps/search-v3', {
-      params: {
-        query: `${keyword} in ${location}`,
-        limit: 50
-      },
+      params: { query: `${keyword} in ${location}`, limit: 50 },
       headers: { 'X-API-KEY': process.env.OUTSCRAPER_API_KEY }
     });
 
-    const places = response.data || []; // ← یہاں data نکالا
+    // Outscraper اصل data یہاں دیتا ہے
+    const places = response.data || [];
     let count = 0;
 
     for (const place of places) {
       await Lead.create({
         name: place.name || 'N/A',
-        phone: place.phone || 'N/A',
+        phone: place.phone || place.phone_universal || 'N/A',
         email: place.email || 'N/A', 
         address: place.full_address || place.address || 'N/A'
       });
@@ -54,7 +52,7 @@ app.post('/api/scrape', async (req, res) => {
 
     res.json({ success: true, added: count });
   } catch (error) {
-    console.log(error.response?.data || error.message);
+    console.log('Error:', error.response?.data || error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });

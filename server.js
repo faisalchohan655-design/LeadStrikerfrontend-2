@@ -14,15 +14,14 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.log('❌ Mongo Error:', err));
 
-const leadSchema = new mongoose.Schema({
-  name: String,
-  phone: String,
-  email: String,
+const Lead = mongoose.model('Lead', new mongoose.Schema({
+  name: String, 
+  phone: String, 
+  email: String, 
   address: String,
   status: { type: String, default: 'New' },
   createdAt: { type: Date, default: Date.now }
-});
-const Lead = mongoose.model('Lead', leadSchema);
+}));
 
 app.post('/api/scrape', async (req, res) => {
   try {
@@ -33,35 +32,33 @@ app.post('/api/scrape', async (req, res) => {
       headers: { 'X-API-KEY': process.env.OUTSCRAPER_API_KEY }
     });
 
-    // یہاں اصل fix ہے بھائی
     const places = response.data || [];
+    console.log('Found places:', places.length);
+    
     let count = 0;
-
-    for (const place of places) {
+    for (const p of places) {
       await Lead.create({
-        name: place.name || 'N/A',
-        phone: place.phone || place.phone_universal || 'N/A',
-        email: place.email || 'N/A', 
-        address: place.full_address || place.address || 'N/A'
+        name: p.name || 'N/A',
+        phone: p.phone || p.phone_universal || 'N/A',
+        email: p.email || 'N/A', 
+        address: p.full_address || p.address || 'N/A'
       });
       count++;
     }
 
     res.json({ success: true, added: count });
-  } catch (error) {
-    console.log('Error:', error.response?.data || error.message);
-    res.status(500).json({ success: false, error: error.message });
+  } catch (e) {
+    console.log('Error:', e.response?.data || e.message);
+    res.status(500).json({ success: false, error: e.message });
   }
 });
 
 app.get('/api/leads', async (req, res) => {
-  const leads = await Lead.find().sort({ createdAt: -1 });
-  res.json(leads);
+  res.json(await Lead.find().sort({ createdAt: -1 }));
 });
 
 app.put('/api/leads/:id', async (req, res) => {
-  const lead = await Lead.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
-  res.json(lead);
+  res.json(await Lead.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true }));
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

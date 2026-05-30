@@ -1,117 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lead Dashboard</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0f172a; 
-      color: #e2e8f0; 
-      padding: 20px;
-    }
-    .container { max-width: 1200px; margin: 0 auto; }
-    h1 { 
-      color: #38bdf8; 
-      margin-bottom: 30px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-    .lead-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 20px;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-    .lead-card:hover {
-      transform: translateY(-5px);
-      border-color: #38bdf8;
-    }
-    .lead-card h3 {
-      color: #38bdf8;
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-    .lead-card p {
-      margin: 8px 0;
-      color: #cbd5e1;
-    }
-    .lead-card strong {
-      color: #94a3b8;
-    }
-    .loading {
-      text-align: center;
-      padding: 50px;
-      font-size: 18px;
-      color: #94a3b8;
-    }
-    .error {
-      background: #7f1d1d;
-      border: 1px solid #ef4444;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🔥 Lead Dashboard</h1>
-    <div id="leads" class="loading">Loading leads...</div>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lead Dashboard</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🚀 Lead Dashboard</h1>
+      <div id="leads" class="loading">Loading leads...</div>
+    </div>
 
-  <script>
-    const API_URL = 'https://leadstrikerbackend-production.up.railway.app/api/leads';
-    
-    async function loadLeads() {
-      const container = document.getElementById('leads');
-      
-      try {
-        const res = await fetch(API_URL);
-        
-        if (!res.ok) {
-          throw new Error(`API Error: ${res.status}`);
-        }
-        
-        const data = await res.json();
-        
-        if (!data || data.length === 0) {
-          container.innerHTML = '<p class="loading">No leads found yet</p>';
-          return;
-        }
-        
-        container.className = 'grid';
-        container.innerHTML = data.map(lead => `
-          <div class="lead-card">
-            <h3>${lead.name || 'No Name'}</h3>
-            <p><strong>Email:</strong> ${lead.email || 'N/A'}</p>
-            <p><strong>Phone:</strong> ${lead.phone || 'N/A'}</p>
-            <p><strong>Source:</strong> ${lead.source || 'Website'}</p>
-            <p><strong>Date:</strong> ${new Date(lead.createdAt || lead.date || Date.now()).toLocaleDateString('en-PK')}</p>
-          </div>
-        `).join('');
-        
-      } catch (err) {
-        container.innerHTML = `
-          <div class="error">
-            <strong>Error:</strong> ${err.message}<br>
-            <small>Check if backend URL is correct and running</small>
-          </div>
-        `;
-      }
-    }
-    
-    loadLeads();
-    setInterval(loadLeads, 30000); // Auto refresh every 30 sec
-  </script>
-</body>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

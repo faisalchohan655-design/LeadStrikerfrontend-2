@@ -10,37 +10,40 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
 
+// MongoDB Connect
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.log('❌ Mongo Error:', err));
+.then(() => console.log('✅ MongoDB Connected'))
+.catch(err => console.log('❌ Mongo Error:', err));
 
+// Lead Schema
 const Lead = mongoose.model('Lead', new mongoose.Schema({
-  name: String, 
-  phone: String, 
-  email: String, 
+  name: String,
+  phone: String,
+  email: String,
   address: String,
   status: { type: String, default: 'New' },
   createdAt: { type: Date, default: Date.now }
 }));
 
+// POST /api/scrape - Google Maps Scraping
 app.post('/api/scrape', async (req, res) => {
   try {
     const { keyword, location } = req.body;
-    
-    const response = await axios.get('https://api.app.outscraper.com/maps/search-v3', {
+
+    const response = await axios.get('https://app.outscraper.com/maps/search-v3', {
       params: { query: `${keyword} in ${location}`, limit: 50 },
       headers: { 'X-API-KEY': process.env.OUTSCRAPER_API_KEY }
     });
 
     const places = response.data || [];
     console.log('Found places:', places.length);
-    
+
     let count = 0;
     for (const p of places) {
       await Lead.create({
         name: p.name || 'N/A',
         phone: p.phone || p.phone_universal || 'N/A',
-        email: p.email || 'N/A', 
+        email: p.email || 'N/A',
         address: p.full_address || p.address || 'N/A'
       });
       count++;
@@ -53,10 +56,12 @@ app.post('/api/scrape', async (req, res) => {
   }
 });
 
+// GET /api/leads - سارے leads دیکھنے کے لیے
 app.get('/api/leads', async (req, res) => {
   res.json(await Lead.find().sort({ createdAt: -1 }));
 });
 
+// PUT /api/leads/:id - Status update
 app.put('/api/leads/:id', async (req, res) => {
   res.json(await Lead.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true }));
 });

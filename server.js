@@ -6,7 +6,7 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({origin: 'https://leadstrikerfrontend-2.netlify.app', credentials: true}));
 app.use(express.json());
 
 // Railway DB Connection
@@ -14,13 +14,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
-
-// ===== فائنل - public چھوٹا p =====
-app.use(express.static(path.join(__dirname, 'public')));
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-// ==================================
 
 // Test route
 app.get('/api/test', (req, res) => {

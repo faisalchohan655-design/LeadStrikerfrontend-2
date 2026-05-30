@@ -1,40 +1,40 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
-const { Pool } = require('pg');
+require('dotenv').config();
 
 const app = express();
+
+// PORT Railway سے آئے گا، ورنہ 3000
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({origin: 'https://leadstrikerfrontend-2.netlify.app', credentials: true}));
+// CORS - اپنا frontend URL یہاں ڈال دے
+app.use(cors({
+  origin: 'https://leadstrikerfrontend-2.netlify.app',
+  credentials: true
+}));
+
 app.use(express.json());
 
-// Railway DB Connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+// MongoDB connect
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('Connected to MongoDB ✅'))
+  .catch((err) => console.log('MongoDB Error:', err));
 
 // Test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'API is working!' });
 });
 
-// Lead submit route
-app.post('/api/leads', async (req, res) => {
-  try {
-    const { name, email, phone, source } = req.body;
-    const result = await pool.query(
-      'INSERT INTO leads (name, email, phone, source) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, email, phone, source]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Database error' });
-  }
+// Root route - تاکہ Cannot GET / نہ آئے
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'LeadStriker API is running 🚀',
+    docs: '/api/test'
+  });
 });
 
+// Server start - Railway والا PORT استعمال ہوگا
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

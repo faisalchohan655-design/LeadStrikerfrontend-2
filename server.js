@@ -10,12 +10,10 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
 
-// MongoDB Connect
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.log('❌ Mongo Error:', err));
 
-// Schema
 const leadSchema = new mongoose.Schema({
   name: String,
   phone: String,
@@ -26,7 +24,6 @@ const leadSchema = new mongoose.Schema({
 });
 const Lead = mongoose.model('Lead', leadSchema);
 
-// Scrape Route
 app.post('/api/scrape', async (req, res) => {
   try {
     const { keyword, location } = req.body;
@@ -36,7 +33,8 @@ app.post('/api/scrape', async (req, res) => {
       headers: { 'X-API-KEY': process.env.OUTSCRAPER_API_KEY }
     });
 
-    const places = response.data || []; // ← یہ لائن ٹھیک کی
+    // یہاں اصل fix ہے بھائی
+    const places = response.data || [];
     let count = 0;
 
     for (const place of places) {
@@ -56,13 +54,11 @@ app.post('/api/scrape', async (req, res) => {
   }
 });
 
-// Get Leads
 app.get('/api/leads', async (req, res) => {
   const leads = await Lead.find().sort({ createdAt: -1 });
   res.json(leads);
 });
 
-// Update Status
 app.put('/api/leads/:id', async (req, res) => {
   const lead = await Lead.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
   res.json(lead);
